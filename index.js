@@ -26,6 +26,13 @@ async function run() {
             res.send(products);
         });
 
+        // API
+        app.get('/buying', async (req, res) => {
+            const buyer = req.query.buyer;
+            const query = { buyer: buyer };
+            const buying = await buyingCollection.find(query).toArray();
+            res.send(buying);
+        })
 
         app.post('/buying', async (req, res) => {
             const buying = req.body;
