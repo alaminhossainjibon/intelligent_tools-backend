@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const app = express();
@@ -18,6 +19,7 @@ async function run() {
         await client.connect();
         const serviceCollection = client.db('intelligent_tools').collection('products');
         const buyingCollection = client.db('intelligent_tools').collection('buying');
+        const userCollection = client.db('intelligent_tools').collection('users');
 
         app.get('/product', async (req, res) => {
             const query = {};
@@ -25,6 +27,18 @@ async function run() {
             const products = await cursor.toArray();
             res.send(products);
         });
+
+        app.put('/user/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = req.body;
+            const filter = { email: email };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: user,
+            };
+            const result = await userCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
+        })
 
         // API
         app.get('/buying', async (req, res) => {
